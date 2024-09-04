@@ -19,3 +19,4 @@ yellowbrick
 tqdm
 langdetect
 scipy
+thinc
