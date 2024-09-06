@@ -1,7 +1,11 @@
 import os
 
 from sklearn.cluster import KMeans
-from sklearn.metrics import silhouette_score, normalized_mutual_info_score, adjusted_rand_score, adjusted_mutual_info_score
+from sklearn.metrics import (silhouette_score,
+                             normalized_mutual_info_score,
+                             adjusted_rand_score,
+                             adjusted_mutual_info_score)
+from sklearn.preprocessing import normalize
 from tqdm import tqdm
 
 from utils.plot_clustering import plot_silhouette_values_for_kappas
@@ -18,7 +22,7 @@ def calc_kmeans(transformed_data, max_clusters, true_labels=None):
     Args:
         transformed_data (numpy.ndarray): Transformed data ready for clustering.
         max_clusters (int): The maximum number of clusters.
-        true_labels (numpy.ndarray, optional): True labels for the data to calculate NMI, ARI, and AMI scores. Defaults to None.
+        true_labels (numpy.ndarray, optional): True labels for the data to calculate NMI, ARI, and AMI scores.
 
     Returns:
         k_silhouette (int): Optimal number of clusters based on Silhouette score calculation.
@@ -28,6 +32,9 @@ def calc_kmeans(transformed_data, max_clusters, true_labels=None):
         statistic_values_ami (list): AMI scores for all the k values.
     """
     min_clusters = 1
+
+    # Normalize the data to apply cosine similarity via normalization
+    transformed_data = normalize(transformed_data)  # Normalize the data to use cosine similarity
 
     # Initialize lists to hold Silhouette and other scores
     statistic_values_silhouette = []

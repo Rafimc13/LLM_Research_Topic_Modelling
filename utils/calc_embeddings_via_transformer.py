@@ -24,8 +24,10 @@ def calc_embeddings(sentences):
     """
 
     # Load model from HuggingFace Hub
-    tokenizer = AutoTokenizer.from_pretrained('sentence-transformers/all-MiniLM-L6-v2')
-    model = AutoModel.from_pretrained('sentence-transformers/all-MiniLM-L6-v2')
+    # tokenizer = AutoTokenizer.from_pretrained('sentence-transformers/all-MiniLM-L6-v2')
+    # model = AutoModel.from_pretrained('sentence-transformers/all-MiniLM-L6-v2')
+    tokenizer = AutoTokenizer.from_pretrained('sentence-transformers/paraphrase-mpnet-base-v2')
+    model = AutoModel.from_pretrained('sentence-transformers/paraphrase-mpnet-base-v2')
 
     # Set up the correct device for the transformer
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
