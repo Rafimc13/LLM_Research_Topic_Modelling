@@ -1,10 +1,8 @@
 import os
 
-
 from sklearn.cluster import HDBSCAN
 from sklearn.metrics import silhouette_score
 from tqdm import tqdm
-import matplotlib.pyplot as plt
 
 from utils.plot_clustering import plot_silhouette_values_for_dbscan  # Assuming you have this utility function
 
@@ -12,14 +10,13 @@ from utils.plot_clustering import plot_silhouette_values_for_dbscan  # Assuming 
 os.environ["LOKY_MAX_CPU_COUNT"] = "4"
 
 
-def calc_hdbscan(transformed_data, max_cluster_size_values):
+def calc_hdbscan(transformed_data):
     """
     Calculates the number of clusters and the corresponding Silhouette scores
     for different values of the min_cluster_size parameter using the HDBSCAN algorithm.
 
     Args:
         transformed_data (numpy.ndarray): Transformed data ready for clustering.
-        max_cluster_size_values (list): A list of min_cluster_size values to evaluate.
 
     Returns:
         optimal_min_cluster_size (int): The min_cluster_size value that results in the highest Silhouette score.
@@ -32,7 +29,7 @@ def calc_hdbscan(transformed_data, max_cluster_size_values):
 
     for max_cluster_size in tqdm(max_cluster_size_values, total=len(max_cluster_size_values)):
         # initialize the HDBSCAN clustering algorithm
-        clusterer = HDBSCAN(min_cluster_size=10, max_cluster_size=max_cluster_size, min_samples=10)
+        clusterer = HDBSCAN(min_cluster_size=min_cluster_size, min_samples=min_samples, metric='euclidean')
         # fit the clustering algorithm
         labels = clusterer.fit_predict(transformed_data)
 

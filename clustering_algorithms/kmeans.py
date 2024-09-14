@@ -7,6 +7,7 @@ from sklearn.metrics import (silhouette_score,
                              adjusted_mutual_info_score)
 from sklearn.preprocessing import normalize
 from tqdm import tqdm
+import numpy as np
 
 from utils.plot_clustering import plot_silhouette_values_for_kappas
 
@@ -69,5 +70,17 @@ def calc_kmeans(transformed_data, max_clusters, true_labels=None):
 
     # Plot the Silhouette values
     plot_silhouette_values_for_kappas(statistic_values_silhouette)
+
+    # print the scores NMI, AMI, ARI
+    if true_labels is not None:
+        best_kappa_nmi = statistic_values_nmi[k_silhouette-1]
+        best_kappa_ami = statistic_values_ami[k_silhouette-1]
+        best_kappa_ari = statistic_values_ari[k_silhouette-1]
+        print(
+            f'The NMI score is: {best_kappa_nmi} for the best Kappa {k_silhouette}')
+        print(
+            f'The AMI score is: {best_kappa_ami} for the best Kappa {k_silhouette}')
+        print(
+            f'The ARI score is: {best_kappa_ari} for the best Kappa {k_silhouette}')
 
     return k_silhouette, statistic_values_silhouette, statistic_values_nmi, statistic_values_ari, statistic_values_ami

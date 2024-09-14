@@ -20,3 +20,6 @@ tqdm
 langdetect
 scipy
 thinc
+umap-learn
+openai
+tiktoken

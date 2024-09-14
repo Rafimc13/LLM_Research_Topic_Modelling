@@ -33,6 +33,7 @@ def load_pretrained_model(df, text_col):
         text_col (str): The name of the column in the dataframe that contains the text data.
 
     Returns:
+        df (pandas.DataFrame): The final dataframe.
         name_of_pretrained_model (str): name of the spacy pretrained model.
 
 
@@ -60,4 +61,4 @@ def load_pretrained_model(df, text_col):
     else:
         name_of_pretrained_model = 'en_core_web_sm'
 
-    return lang_of_dataset
+    return df, name_of_pretrained_model
