@@ -26,11 +26,7 @@ def calc_kmeans(transformed_data, max_clusters, true_labels=None):
         true_labels (numpy.ndarray, optional): True labels for the data to calculate NMI, ARI, and AMI scores.
 
     Returns:
-        k_silhouette (int): Optimal number of clusters based on Silhouette score calculation.
-        statistic_values_silhouette (list): Silhouette scores for all the k values.
-        statistic_values_nmi (list): NMI scores for all the k values.
-        statistic_values_ari (list): ARI scores for all the k values.
-        statistic_values_ami (list): AMI scores for all the k values.
+        k_means_results(dict): Dictionary containing all the results.
     """
     min_clusters = 1
 
@@ -51,7 +47,7 @@ def calc_kmeans(transformed_data, max_clusters, true_labels=None):
 
         # Append Silhouette score values
         if kappa == 1:
-            continue
+            pass
         else:
             statistic_values_silhouette.append(silhouette_score(transformed_data, km.labels_))
 
@@ -83,4 +79,40 @@ def calc_kmeans(transformed_data, max_clusters, true_labels=None):
         print(
             f'The ARI score is: {best_kappa_ari} for the best Kappa {k_silhouette}')
 
-    return k_silhouette, statistic_values_silhouette, statistic_values_nmi, statistic_values_ari, statistic_values_ami
+    # store the results into a dictionary to return it
+    k_means_results = {
+        'best_kappa': k_silhouette,
+        'silhouette_score_values': statistic_values_silhouette,
+        'nmi_score_values': statistic_values_nmi,
+        'ami_score_values': statistic_values_ami,
+        'ari_score_values': statistic_values_ari,
+    }
+    return k_means_results
+
+
+def run_best_kmeans(data, best_kappa):
+    """
+    Run the best performing kmeans clustering based on the calculations of best kappa
+    Args:
+        data (numpy.ndarray): Transformed data ready for clustering.
+        best_kappa (int): Best kappa to run the kmeans.
+
+    Returns:
+        results(dict): Dictionary containing all the results.
+    """
+    km = KMeans(n_clusters=best_kappa, random_state=42, n_init=10)
+    # Fit the clustering algorithm
+    if best_kappa == 1:
+        best_kappa = 2
+
+    labels = km.fit(data)
+    silhouette_final_score = silhouette_score(silhouette_score(data, labels))
+    # Print the results
+    print(f'Silhouette score for best kappa: { silhouette_final_score:.3f}')
+
+    results = {
+        'clusterer': km,
+        'labels': labels,
+        'centroids': km.cluster_centers_,
+    }
+    return results

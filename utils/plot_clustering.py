@@ -52,20 +52,20 @@ def plot_sse_values_for_kappas(sse_scores):
     plt.close(fig)
 
 
-def plot_silhouette_values_for_dbscan(silhouette_scores, eps_values):
+def plot_silhouette_values_for_dbscan(silhouette_scores, min_cluster_size):
     """
     Plots the Silhouette Scores for different eps values for DBSCAN algorithm.
 
     Args:
         silhouette_scores (list): A list of Silhouette scores corresponding to different eps values.
-        eps_values (list): A list of eps values that were evaluated.
+        min_cluster_size (list): A list of size values of clusters that were evaluated.
 
     Returns:
         None: The function displays a plot of Silhouette scores against the eps values.
     """
     sns.set(style="whitegrid")
     fig, ax = plt.subplots(figsize=(10, 6))
-    ax.plot(eps_values, silhouette_scores, marker='o', color='blue', label='Silhouette Score')
+    ax.plot(min_cluster_size, silhouette_scores, marker='o', color='blue', label='Silhouette Score')
     ax.set_xlabel('eps Value')
     ax.set_ylabel('Silhouette Score')
     ax.set_title('Silhouette Scores by eps Value for DBSCAN algorithm')
@@ -74,17 +74,18 @@ def plot_silhouette_values_for_dbscan(silhouette_scores, eps_values):
     plt.close(fig)
 
 
-def plot_silhouette_values_for_agglomerative(silhouette_scores, n_clusters_values):
+def plot_silhouette_values_for_agglomerative(silhouette_scores):
     """
     Plots the Silhouette Scores for different n_clusters values for Agglomerative algorithm.
 
     Args:
         silhouette_scores (list): A list of Silhouette scores corresponding to different n_clusters values.
-        n_clusters_values (list): A list of n_clusters values that were evaluated.
 
     Returns:
         None: The function displays a plot of Silhouette scores against the n_clusters values.
     """
+    # adjusted to match k-values with silhouette scores
+    n_clusters_values = range(1, len(silhouette_scores) + 1)
     sns.set(style="whitegrid")
     fig, ax = plt.subplots(figsize=(10, 6))
     ax.plot(n_clusters_values, silhouette_scores, marker='o', color='blue', label='Silhouette Score')

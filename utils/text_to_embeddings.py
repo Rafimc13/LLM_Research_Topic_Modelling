@@ -4,6 +4,7 @@ import torch
 import torch.nn.functional as F
 from gensim.models import FastText
 import numpy as np
+from tqdm import tqdm
 
 
 def tokenizer(document, nlp):
@@ -61,20 +62,18 @@ def mean_pooling(model_output, attention_mask):
     return torch.sum(token_embeddings * input_mask_expanded, 1) / torch.clamp(input_mask_expanded.sum(1), min=1e-9)
 
 
-def calc_embeddings(sentences):
+def calc_embeddings(sentences, batch_size=32):
     """
-    Calculates embeddings with a transformer model
+    Calculates embeddings with a transformer model in batches.
 
     Args:
-        sentences (np.array): Sentences to be transformed as embeddings.
+        sentences (np.array or list): Sentences to be transformed as embeddings.
+        batch_size (int): The size of each batch for processing.
 
     Returns:
-        embeddings (np.array): calculated embeddings.
+        embeddings (np.array): Calculated embeddings.
     """
-
     # Load model from HuggingFace Hub
-    # tokenizer = AutoTokenizer.from_pretrained('sentence-transformers/all-MiniLM-L6-v2')
-    # model = AutoModel.from_pretrained('sentence-transformers/all-MiniLM-L6-v2')
     tokenizer = AutoTokenizer.from_pretrained('sentence-transformers/paraphrase-mpnet-base-v2')
     model = AutoModel.from_pretrained('sentence-transformers/paraphrase-mpnet-base-v2')
 
@@ -82,22 +81,34 @@ def calc_embeddings(sentences):
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     print(f"Available device for the model is: '{device}'")
     model.to(device)
-    # Tokenize sentences
-    encoded_input = tokenizer(sentences, padding=True, truncation=True, return_tensors='pt')
-    encoded_input.to(device)
-    # Compute token embeddings
-    with torch.no_grad():
-        model_output = model(**encoded_input)
 
-    # Perform pooling
-    transform_data_embeddings = mean_pooling(model_output, encoded_input['attention_mask'])
+    # Initialize list to store embeddings
+    all_embeddings = []
 
-    # Normalize embeddings
-    transform_data_embeddings = F.normalize(transform_data_embeddings, p=2, dim=1)
+    # Process sentences in batches
+    for i in tqdm(range(0, len(sentences), batch_size)):
+        batch_sentences = sentences[i:i + batch_size]
 
-    transform_data_embeddings = transform_data_embeddings.cpu().detach().numpy().tolist()
-    print('Calculation of embeddings completed succesfully')
-    return transform_data_embeddings
+        # Tokenize batch
+        encoded_input = tokenizer(batch_sentences, padding=True, truncation=True, return_tensors='pt')
+        encoded_input.to(device)
+
+        # Compute token embeddings
+        with torch.no_grad():
+            model_output = model(**encoded_input)
+
+        # Perform pooling
+        batch_embeddings = mean_pooling(model_output, encoded_input['attention_mask'])
+
+        # Normalize embeddings
+        batch_embeddings = F.normalize(batch_embeddings, p=2, dim=1)
+
+        # Move embeddings back to CPU and store them
+        all_embeddings.extend(batch_embeddings.cpu().detach().numpy().tolist())
+
+    print('Calculation of embeddings completed successfully')
+
+    return np.array(all_embeddings)
 
 
 def train_fasttext_and_transform(corpus, sentences, text_col, vector_size=256, window=10):

@@ -17,7 +17,7 @@ os.environ["LOKY_MAX_CPU_COUNT"] = "4"
 def calc_agglomerative(transformed_data, n_clusters_values, true_labels=None):
     """
     Calculates the number of clusters and the corresponding Silhouette scores
-    for different values of the n_clusters parameter using the AgglomerativeClustering algorithm.
+    for different values of the n_clusters parameter using the Agglomerative Clustering algorithm.
 
     Args:
         transformed_data (numpy.ndarray): Transformed data ready for clustering.
@@ -25,8 +25,7 @@ def calc_agglomerative(transformed_data, n_clusters_values, true_labels=None):
         true_labels (numpy.ndarray, optional): True labels for the data to calculate NMI, ARI, and AMI scores.
 
     Returns:
-        optimal_n_clusters (int): The n_clusters value that results in the highest Silhouette score.
-        silhouette_scores (list): Silhouette scores for each n_clusters value.
+        results (dict): Dictionary containing all the results.
     """
 
     silhouette_scores = []
@@ -48,38 +47,44 @@ def calc_agglomerative(transformed_data, n_clusters_values, true_labels=None):
         # calculate the Silhouette score (only if there are at least 2 clusters)
         if n_clusters > 1:
             silhouette_avg = silhouette_score(transformed_data, labels)
+            silhouette_scores.append(silhouette_avg)
         else:
-            silhouette_avg = 0
-
-        silhouette_scores.append(silhouette_avg)
+            pass
 
         # Calculate and append NMI, ARI, AMI scores (only if true labels are provided)
-        if true_labels is not None and n_clusters > 1:
+        if true_labels is not None:
             statistic_values_nmi.append(normalized_mutual_info_score(true_labels, labels))
             statistic_values_ari.append(adjusted_rand_score(true_labels, labels))
             statistic_values_ami.append(adjusted_mutual_info_score(true_labels, labels))
-        else:
-            statistic_values_nmi.append(-1)
-            statistic_values_ari.append(-1)
-            statistic_values_ami.append(-1)
 
     # determine the optimal n_clusters value based on the maximum Silhouette score
     optimal_n_clusters_idx = silhouette_scores.index(max(silhouette_scores))
-    optimal_n_clusters = n_clusters_values[optimal_n_clusters_idx]
+    optimal_n_clusters = n_clusters_values[optimal_n_clusters_idx] + 1
 
     # print the results
     print(f'The optimal number of clusters based on Silhouette score is: {optimal_n_clusters}')
 
     # Plot the Silhouette scores for different n_clusters values
-    plot_silhouette_values_for_agglomerative(silhouette_scores, n_clusters_values)
+    plot_silhouette_values_for_agglomerative(silhouette_scores)
 
-    # Print the scores NMI, AMI, ARI if true labels are provided
+    # print the scores NMI, AMI, ARI
     if true_labels is not None:
+        best_nmi = statistic_values_nmi[optimal_n_clusters-1]
+        best_ami = statistic_values_ami[optimal_n_clusters-1]
+        best_ari = statistic_values_ari[optimal_n_clusters-1]
         print(
-            f'The best NMI score is: {np.max(statistic_values_nmi)} and the best Kappa: {np.argmax(statistic_values_nmi)}')
+            f'The NMI score is: {best_nmi} for the best Kappa {optimal_n_clusters}')
         print(
-            f'The best AMI score is: {np.max(statistic_values_ami)} and the best Kappa: {np.argmax(statistic_values_ami)}')
+            f'The AMI score is: {best_ami} for the best Kappa {optimal_n_clusters}')
         print(
-            f'The best ARI score is: {np.max(statistic_values_ari)} and the best Kappa: {np.argmax(statistic_values_ari)}')
+            f'The ARI score is: {best_ari} for the best Kappa {optimal_n_clusters}')
 
-    return optimal_n_clusters, silhouette_scores, statistic_values_nmi, statistic_values_ari, statistic_values_ami
+    # store the results into a dictionary to return it
+    results = {
+        'best_kappa': optimal_n_clusters,
+        'silhouette_score_values': silhouette_scores,
+        'nmi_score_values': statistic_values_nmi,
+        'ami_score_values': statistic_values_ami,
+        'ari_score_values': statistic_values_ari,
+    }
+    return results

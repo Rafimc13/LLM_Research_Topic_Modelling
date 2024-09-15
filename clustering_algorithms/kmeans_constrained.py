@@ -27,6 +27,7 @@ def calc_penalty_factor(k, max_clusters):
 def get_number_of_clusters_with_statistic_constrained(
         transformed_data,
         max_clusters,
+        cluster_min_size=5,
         true_labels=None,
 ):
     """
@@ -37,6 +38,7 @@ def get_number_of_clusters_with_statistic_constrained(
     Args:
         transformed_data (numpy.ndarray or sparse): Transformed data ready for clustering.
         max_clusters (int): The maximum number of clusters.
+        cluster_min_size (int): Minimum size of a formed cluster
         true_labels (numpy.ndarray, optional): True labels for the data to calculate NMI, ARI, and AMI scores.
     Returns:
         kappa (int): Optimal number of clusters based on Silhouette score.
@@ -53,15 +55,20 @@ def get_number_of_clusters_with_statistic_constrained(
     best_silhouette = -1  # Silhouette score ranges from -1 to 1
     best_kappa = None
     statistic_values = []
-    cluster_min_size = 2
     statistic_values_nmi = []
     statistic_values_ari = []
     statistic_values_ami = []
-
+    # define
+    cluster_minimum_size = min(cluster_min_size, len(transformed_data))
     for kappa in tqdm(range(min_clusters, max_clusters + 1), total=(max_clusters - min_clusters + 1)):
+
+        if cluster_minimum_size * kappa > len(transformed_data):
+            print('The product of size_min and n_clusters cannot exceed the number of samples.')
+            print('Terminating the calculation...')
+            break
         # initialize the clustering algorithm
         km_cv = KMeansConstrained(
-            n_clusters=kappa, size_min=min(cluster_min_size, len(transformed_data))
+            n_clusters=kappa, size_min=cluster_minimum_size
         )
         # fit the clustering algorithm
         km_cv.fit(transformed_data)
@@ -100,4 +107,41 @@ def get_number_of_clusters_with_statistic_constrained(
         print(
             f'The ARI score is: {best_kappa_ari} for the best Kappa {best_kappa}')
 
-    return best_kappa, statistic_values, statistic_values_nmi, statistic_values_ari, statistic_values_ami
+    # store the results into a dictionary to return it
+    kmeans_results = {
+        'best_kappa': best_kappa,
+        'silhouette_score_values': statistic_values,
+        'nmi_score_values': statistic_values_nmi,
+        'ami_score_values': statistic_values_ami,
+        'ari_score_values': statistic_values_ari,
+    }
+    return kmeans_results
+
+
+def run_best_kmeans(data, best_kappa):
+    """
+    Run the best performing kmeans constrained clustering based on the calculations of best kappa
+    Args:
+        data (numpy.ndarray): Transformed data ready for clustering.
+        best_kappa (int): Best kappa to run the kmeans.
+
+    Returns:
+        results(dict): Dictionary containing all the results.
+    """
+    cluster_min_size = 5
+    # initialize the clustering algorithm
+    km_cv = KMeansConstrained(
+        n_clusters=best_kappa, size_min=min(cluster_min_size, len(data))
+    )
+
+    labels = km_cv.fit(data)
+    silhouette_final_score = silhouette_score(silhouette_score(data, labels))
+    # Print the results
+    print(f'Silhouette score for best kappa: { silhouette_final_score:.3f}')
+
+    results = {
+        'clusterer': km_cv,
+        'labels': labels,
+        'centroids': km_cv.cluster_centers_,
+    }
+    return results
