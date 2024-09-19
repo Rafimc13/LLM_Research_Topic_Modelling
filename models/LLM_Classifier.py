@@ -2,9 +2,8 @@ from tqdm import tqdm
 from sklearn.metrics import classification_report
 import re
 
-from utils import load_prompt
+from utils.load_prompts import load_chosen_prompt, get_final_prompt
 from utils.GPT_Prompting import PromptingGPT
-from utils.load_prompt import get_prompt
 
 
 def GPT_Classifier(comments, name_of_prompt, GPT_model):
@@ -28,9 +27,9 @@ def GPT_Classifier(comments, name_of_prompt, GPT_model):
     for comment in tqdm(comments):
         try:
             gpt_prompts = PromptingGPT()  # Create a new instance of GPT model in each iteration
-            prompt_for_classification = load_prompt.load_chosen_prompt(name_of_prompt)
-            prompt = get_prompt(prompt_for_classification, comment)
-            response = gpt_prompts.make_prompts(prompt, GPT_model=GPT_model).strip()
+            prompt_template = load_chosen_prompt(name_of_prompt)
+            final_prompt = get_final_prompt(prompt_template, comment=comment)
+            response = gpt_prompts.make_prompts(final_prompt, gpt_model=GPT_model).strip()
 
             # Find all digits in the response
             matches = re.findall(r'\d+', response)
