@@ -134,14 +134,14 @@ def run_best_kmeans(data, best_kappa):
         n_clusters=best_kappa, size_min=min(cluster_min_size, len(data))
     )
 
-    labels = km_cv.fit(data)
-    silhouette_final_score = silhouette_score(silhouette_score(data, labels))
+    km_cv.fit(data)
+    silhouette_final_score = silhouette_score(data, km_cv.labels_)
     # Print the results
     print(f'Silhouette score for best kappa: { silhouette_final_score:.3f}')
 
     results = {
         'clusterer': km_cv,
-        'labels': labels,
+        'labels': km_cv.labels_,
         'centroids': km_cv.cluster_centers_,
     }
     return results

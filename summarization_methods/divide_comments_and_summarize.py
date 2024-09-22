@@ -86,13 +86,11 @@ def create_summary_for_groups_of_comments(groups, prompt, gpt_model, **kwargs):
     return summaries
 
 
-def final_summary_of_divided_comments(summaries, prompt, gpt_model, **kwargs):
+def final_summary_of_divided_comments(prompt, gpt_model, **kwargs):
     """
     Generate final summary based on summaries of comments using a GPT model.
 
     Args:
-        summaries (list):
-            A list of summaries where each summary contains the summary for a group of comments.
         prompt (str):
             The prompt template to be used for generating the summary.
         gpt_model (str):
@@ -105,12 +103,10 @@ def final_summary_of_divided_comments(summaries, prompt, gpt_model, **kwargs):
     """
     try:
         gpt_prompts = PromptingGPT()  # Create a new instance of GPT model in each iteration
-        # Update kwarg of comments with the chosen comments
-        kwargs['summaries'] = summaries
         final_prompt = get_final_prompt(prompt=prompt, **kwargs)
         final_summary = gpt_prompts.make_prompts(final_prompt, gpt_model=gpt_model).strip()
         return final_summary
     except Exception as e:
-        print(f"Error processing final summary summary: {e}")
+        print(f"Error processing final summary: {e}")
         return None
 
