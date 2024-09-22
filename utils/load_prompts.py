@@ -109,6 +109,17 @@ prompts_dict = {
         Response 2: '2'
         Please provide only the label no more description.
         Here are is the comment for the classification task: {comment}
+    """,
+    'prompt_for_topic_extraction':
+    """
+    Hello my good model. I would like you to implement a topic extractions, in the comment that I will provide you. 
+    The discussion of the comment is about: "{topic}" and the language of the comment is {language}. Please think about 
+    your answer and create topics as more accurate as possible. Moreover, I will provide you with the lists of extracted
+    topics for some previous comments. Please write only the list of extracted topics and not anything else. Here is an 
+    example of the format of your response:
+    Extracted topics: ['topic1', 'topic2', ... etc]
+    Here are the previous extracted topics: {topics} 
+    Here is the comment: {comment}  
     """
 }
 
@@ -119,6 +130,7 @@ required_args = {
     "prompt_for_summarizing_multiple_comments": ["language", "topic", "previous_summaries", "comments"],
     "final_prompt_for_summarizing_multiple_comments": ["topic", "summaries"],
     "prompt_for_classification_QMSUM": ["comment"],
+    "prompt_for_topic_extraction": ["topic", "language", "topics", "comment"]
 }
 
 
