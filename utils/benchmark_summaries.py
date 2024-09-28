@@ -32,7 +32,7 @@ def calc_and_plot_bleu_scores(summaries_df, text_col, title_col):
                 raise ValueError(
                     'The position of the original summary is not 0. Rebase the original summary. Terminating...')
 
-        column_name = f"{str(summaries_df.loc[0, title_col])}_vs_{str(summaries_df.loc[idx, title_col])}"
+        column_name = f"{str(summaries_df.loc[0, title_col])}_vs_\n{str(summaries_df.loc[idx, title_col])}"
         bleu_scores[column_name] = sentence_bleu(
             [summaries_df.loc[0, text_col].split()],
             summaries_df.loc[idx, text_col].split(),
@@ -57,7 +57,7 @@ def calc_and_plot_bleu_scores(summaries_df, text_col, title_col):
     ax.set_ylabel('BLEU Score')
     ax.set_title('BLEU Scores Comparing Summarization Techniques')
     ax.set_xticks(positions)
-    ax.set_xticklabels(labels, rotation=30, fontsize=9, ha='left')
+    ax.set_xticklabels(labels, rotation=45, fontsize=8, ha='right')
     ax.set_ylim(0, 1)
 
     # Adding the actual value on top of each bar
@@ -99,7 +99,7 @@ def calc_and_plot_rouge_scores(summaries_df, text_col, title_col):
                 raise ValueError(
                     'The position of the original summary is not 0. Rebase the original summary. Terminating...')
 
-        column_name = f"{str(summaries_df.loc[0, title_col])}_vs_{str(summaries_df.loc[idx, title_col])}"
+        column_name = f"{str(summaries_df.loc[0, title_col])}_vs_\n{str(summaries_df.loc[idx, title_col])}"
         rouge_scores[column_name] = rouge.get_scores(summaries_df.loc[0, text_col],
                                                      summaries_df.loc[idx, text_col])
     # Extracting ROUGE-1 and ROUGE-2 scores
@@ -128,7 +128,7 @@ def calc_and_plot_rouge_scores(summaries_df, text_col, title_col):
             ax.text(bar.get_x() + bar.get_width() / 2.0, yval, f"{yval:.3f}", va='bottom', ha='center')
         ax.set_title(f'ROUGE-1 {metric}')
         ax.set_xticks(positions)
-        ax.set_xticklabels(labels, rotation=60, fontsize=8.5, ha='left')
+        ax.set_xticklabels(labels, rotation=60, fontsize=8.5, ha='right')
         ax.set_ylabel(metric)
         ax.set_ylim(0, 1)
 
@@ -139,7 +139,7 @@ def calc_and_plot_rouge_scores(summaries_df, text_col, title_col):
             ax.text(bar.get_x() + bar.get_width() / 2.0, yval, f"{yval:.3f}", va='bottom', ha='center')
         ax.set_title(f'ROUGE-2 {metric}')
         ax.set_xticks(positions)
-        ax.set_xticklabels(labels, rotation=60, fontsize=8.5, ha='left')
+        ax.set_xticklabels(labels, rotation=60, fontsize=8.5, ha='right')
         ax.set_ylabel(metric)
         ax.set_ylim(0, 1)
 
@@ -177,7 +177,7 @@ def calc_and_plot_bert_scores(summaries_df, text_col, title_col, model_to_use='r
                 raise ValueError(
                     'The position of the original summary is not 0. Rebase the original summary. Terminating...')
 
-        column_name = f"{str(summaries_df.loc[0, title_col])}_vs_{str(summaries_df.loc[idx, title_col])}"
+        column_name = f"{str(summaries_df.loc[0, title_col])}_vs_\n{str(summaries_df.loc[idx, title_col])}"
         # Compute precision, recall, and F1 for each summary comparison
         P, R, F1 = bertscore([summaries_df.loc[idx, text_col]],
                              [summaries_df.loc[0, text_col]],
@@ -212,7 +212,7 @@ def calc_and_plot_bert_scores(summaries_df, text_col, title_col, model_to_use='r
         ax.text(bar.get_x() + bar.get_width() / 2.0, yval, f"{yval:.3f}", va='bottom', ha='center')
     ax.set_title('BERT Precision')
     ax.set_xticks(positions)
-    ax.set_xticklabels(labels, rotation=45, fontsize=9, ha='left')
+    ax.set_xticklabels(labels, rotation=45, fontsize=9, ha='right')
     ax.set_ylim(0, 1)
 
     # Recall plot
@@ -223,7 +223,7 @@ def calc_and_plot_bert_scores(summaries_df, text_col, title_col, model_to_use='r
         ax.text(bar.get_x() + bar.get_width() / 2.0, yval, f"{yval:.3f}", va='bottom', ha='center')
     ax.set_title('BERT Recall')
     ax.set_xticks(positions)
-    ax.set_xticklabels(labels, rotation=45, fontsize=9, ha='left')
+    ax.set_xticklabels(labels, rotation=45, fontsize=9, ha='right')
     ax.set_ylim(0, 1)
 
     # F1 plot
@@ -234,7 +234,7 @@ def calc_and_plot_bert_scores(summaries_df, text_col, title_col, model_to_use='r
         ax.text(bar.get_x() + bar.get_width() / 2.0, yval, f"{yval:.3f}", va='bottom', ha='center')
     ax.set_title('BERT F1')
     ax.set_xticks(positions)
-    ax.set_xticklabels(labels, rotation=45, fontsize=9, ha='left')
+    ax.set_xticklabels(labels, rotation=45, fontsize=9, ha='right')
     ax.set_ylim(0, 1)
 
     # Adjust layout to make room for the title
