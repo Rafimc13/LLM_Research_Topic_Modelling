@@ -29,8 +29,8 @@ def load_pretrained_model(df, text_col):
     Load a pretrained language model based on the most common language in a sampled dataset.
 
     Args:
-        df (pandas.DataFrame): The dataframe containing text data.
-        text_col (str): The name of the column in the dataframe that contains the text data.
+        df (pandas.DataFrame): The dataframe containing text outputs.
+        text_col (str): The name of the column in the dataframe that contains the text outputs.
 
     Returns:
         df (pandas.DataFrame): The final dataframe.

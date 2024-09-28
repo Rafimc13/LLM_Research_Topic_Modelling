@@ -16,7 +16,7 @@ def calc_hdbscan(transformed_data, min_cluster_size_values, min_samples=10):
     for different values of the min_cluster_size parameter using the HDBSCAN algorithm.
 
     Args:
-        transformed_data (numpy.ndarray): Transformed data ready for clustering.
+        transformed_data (numpy.ndarray): Transformed outputs ready for clustering.
         min_cluster_size_values (list): List of min_cluster_size values to test.
         min_samples (int): The min_samples value for HDBSCAN. Default is 5.
 

@@ -26,6 +26,7 @@ def topic_extraction(df, text_col, prompt_template, gpt_model, **kwargs):
      List of integer labels corresponding to the classification results.
      """
     flattened_topics = []
+    df['topics'] = ""
     for idx, comment in enumerate(tqdm(df[text_col].to_list(), total=len(df))):
         try:
             gpt_prompts = PromptingGPT()  # Create a new instance of GPT model in each iteration
@@ -36,19 +37,21 @@ def topic_extraction(df, text_col, prompt_template, gpt_model, **kwargs):
             response = gpt_prompts.make_prompts(final_prompt, gpt_model=gpt_model).strip()
 
             _, topics = response.split(":", 1)
-            topics = ast.literal_eval(topics.strip())
+            topics = topics.strip()
             df.loc[idx, 'topics'] = topics
+            topics = ast.literal_eval(topics)
             for topic in topics:
                 flattened_topics.append((idx, topic))
 
         except Exception as e:
             print(f"Error processing topics of '{comment}'")
-        topics_dict = {
-            'idx': [item[0] for item in flattened_topics],
-            'topic': [item[1] for item in flattened_topics]
-        }
-        df_topics = pd.DataFrame(topics_dict)
-
+    # build the final topics dict
+    topics_dict = {
+        'comment': [item[0] for item in flattened_topics],
+        'topics': [item[1] for item in flattened_topics]
+    }
+    df_topics = pd.DataFrame(topics_dict)
+    df['topics'] = df['topics'].apply(lambda x: ast.literal_eval(x))
     return df, df_topics
 
 
@@ -92,7 +95,9 @@ def summarize_comments_by_cluster(df, text_col, prompt_name, gpt_model, **kwargs
             kwargs['previous_summaries'] = summaries[-5:]
             kwargs['comments'] = comments
             final_prompt = get_final_prompt(prompt=prompt_name, **kwargs)
+            print(f'Summary for cluster label: {label}')
             summary = gpt_prompts.make_prompts(final_prompt, gpt_model=gpt_model).strip()
+            print('-------------------------------------------------------------------------------------')
             summaries.append(summary)
         except Exception as e:
             print(f"Error processing summary for label: {label}")

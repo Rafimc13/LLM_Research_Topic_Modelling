@@ -21,17 +21,17 @@ def calc_kmeans(transformed_data, max_clusters, true_labels=None):
     based on the optimum value of the specified statistic for the original KMeans.
 
     Args:
-        transformed_data (numpy.ndarray): Transformed data ready for clustering.
+        transformed_data (numpy.ndarray): Transformed outputs ready for clustering.
         max_clusters (int): The maximum number of clusters.
-        true_labels (numpy.ndarray, optional): True labels for the data to calculate NMI, ARI, and AMI scores.
+        true_labels (numpy.ndarray, optional): True labels for the outputs to calculate NMI, ARI, and AMI scores.
 
     Returns:
         k_means_results(dict): Dictionary containing all the results.
     """
     min_clusters = 1
 
-    # Normalize the data to apply cosine similarity via normalization
-    transformed_data = normalize(transformed_data)  # Normalize the data to use cosine similarity
+    # Normalize the outputs to apply cosine similarity via normalization
+    transformed_data = normalize(transformed_data)  # Normalize the outputs to use cosine similarity
 
     # Initialize lists to hold Silhouette and other scores
     statistic_values_silhouette = []
@@ -94,7 +94,7 @@ def run_best_kmeans(data, best_kappa):
     """
     Run the best performing kmeans clustering based on the calculations of best kappa
     Args:
-        data (numpy.ndarray): Transformed data ready for clustering.
+        data (numpy.ndarray): Transformed outputs ready for clustering.
         best_kappa (int): Best kappa to run the kmeans.
 
     Returns:

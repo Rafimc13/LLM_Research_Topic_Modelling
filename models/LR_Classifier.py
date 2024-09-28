@@ -7,13 +7,13 @@ from sklearn.feature_extraction.text import CountVectorizer
 
 def prepare_data_LR(x_train, x_test):
     """
-    Prepare the data for Logistic Regression Classifier
+    Prepare the outputs for Logistic Regression Classifier
     :param x_train: training dataset with comments
     :param x_test: Training dataset with labels
     :return x_train, x_test vectorized
     """
 
-    # Tokenize text data and convert to matrix of token counts
+    # Tokenize text outputs and convert to matrix of token counts
     vectorizer = CountVectorizer()
     x_train = vectorizer.fit_transform(x_train)
     x_test = vectorizer.transform(x_test)
@@ -23,7 +23,7 @@ def prepare_data_LR(x_train, x_test):
 
 def train_logistic_regression(x_train, y_train):
     """
-    Train a logistic regression model using the provided training data.
+    Train a logistic regression model using the provided training outputs.
 
     Parameters:
     - x_train: numpy array or sparse matrix, shape (n_samples, n_features)
@@ -54,7 +54,7 @@ def evaluate_logistic_regression(model, x_test, y_test):
     :param y_test: labels for evaluating the model
     :return: Classification Report
     """
-    # Predict on test data
+    # Predict on test outputs
     y_pred = model.predict(x_test)
 
     # Print classification report

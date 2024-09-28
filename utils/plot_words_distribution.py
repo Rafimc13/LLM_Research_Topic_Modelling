@@ -20,7 +20,7 @@ def plot_distribution_of_words(df, column_to_plot):
     Plots a histogram showing the distribution of word counts for comments in a given dataframe column.
 
     Args:
-        df (pandas.DataFrame): The dataframe containing the text data.
+        df (pandas.DataFrame): The dataframe containing the text outputs.
         column_to_plot (str): The column of interest in the dataframe where the comments are stored.
 
     Returns:

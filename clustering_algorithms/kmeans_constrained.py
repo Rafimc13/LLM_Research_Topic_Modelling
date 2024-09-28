@@ -36,10 +36,10 @@ def get_number_of_clusters_with_statistic_constrained(
     while applying a penalty as kappa increases.
 
     Args:
-        transformed_data (numpy.ndarray or sparse): Transformed data ready for clustering.
+        transformed_data (numpy.ndarray or sparse): Transformed outputs ready for clustering.
         max_clusters (int): The maximum number of clusters.
         cluster_min_size (int): Minimum size of a formed cluster
-        true_labels (numpy.ndarray, optional): True labels for the data to calculate NMI, ARI, and AMI scores.
+        true_labels (numpy.ndarray, optional): True labels for the outputs to calculate NMI, ARI, and AMI scores.
     Returns:
         kappa (int): Optimal number of clusters based on Silhouette score.
         statistic_values (list): Silhouette values of the algorithm for all the kappas.
@@ -47,7 +47,7 @@ def get_number_of_clusters_with_statistic_constrained(
 
     min_clusters = 2  # Silhouette score requires at least 2 clusters
 
-    # Check if the data is sparse and convert to dense if necessary
+    # Check if the outputs is sparse and convert to dense if necessary
     if issparse(transformed_data):
         transformed_data = transformed_data.toarray()
 
@@ -122,7 +122,7 @@ def run_best_kmeans(data, best_kappa):
     """
     Run the best performing kmeans constrained clustering based on the calculations of best kappa
     Args:
-        data (numpy.ndarray): Transformed data ready for clustering.
+        data (numpy.ndarray): Transformed outputs ready for clustering.
         best_kappa (int): Best kappa to run the kmeans.
 
     Returns:

@@ -65,16 +65,38 @@ prompts_dict = {
         Please provide only the label no more description.
         Here are is the comment for the classification task: {comment}
     """,
+    'prompt_for_classification_QMSUM':
+        """
+            Hello my good model. I would like you to classify the comment that I will provide you. 
+            The comment is about a Meeting of a company for products.
+            I would like you to classify this comment among 3 classes positive, neutral and negative. The classes are: 
+            positive class: 0
+            neutral class: 1
+            negative class: 2
+            Please keep in mind that the comments are in English. Moreover I will give you some examples on how to decide
+            the label of the comment.
+            Example comment 1: 
+            Um thank you for that . Uh Craig do you wanna?
+            Response 1: '0'
+            Example comment 2:
+            Is it working ?
+            Response 2: '1'
+            Example comment 3:
+            Mm . Not quite .
+            Response 2: '2'
+            Please provide only the label no more description.
+            Here are is the comment for the classification task: {comment}
+        """,
     'prompt_for_summarizing_multiple_comments':
     """
     Hello my good model, I would like to create a summary for a group of comments. Please consider the length
     of the summary based on the insights of the comments. Try not to repeat similar topics. The language of the comments
     is {language} and the topic of discussion is: {topic} 
     I will provide you the comments and I would like you to create the summary in order a to be able to get the most
-    important topics and insights of these comments. Finally I am going to give you summaries of the previous groups of
+    important topics and insights of these comments. Finally, I am going to give you summaries of the previous groups of
     comments of the same topic discussion, in order to be able to use similar structure.
     Please write me an efficient summary with all the insights from the comments. Please write only the 
-    summary and do not add anything else. Thank you.
+    summary and do not add anything else in the response. Thank you.
     Here are the history of the previous summaries of the previous groups of comments: {previous_summaries}
     Here are the comments I would like to create a summary: {comments}
     """,
@@ -85,30 +107,8 @@ prompts_dict = {
     However, for the reason that the comments were too many, I created a summary for groups of comments. So, I would like
     you to create a final summary based on these summaries of the comments. Please consider the length
     of the summary based on the insights of the summaries. Try not to repeat similar topics. Please write only the 
-    summary and do not add anything else. Thank you.
+    summary and do not add anything else in the response. Thank you.
     Here are the summaries: {summaries} 
-    """,
-    'prompt_for_classification_QMSUM':
-    """
-        Hello my good model. I would like you to classify the comment that I will provide you. 
-        The comment is about a Meeting of a company for products.
-        I would like you to classify this comment among 3 classes positive, neutral and negative. The classes are: 
-        positive class: 0
-        neutral class: 1
-        negative class: 2
-        Please keep in mind that the comments are in English. Moreover I will give you some examples on how to decide
-        the label of the comment.
-        Example comment 1: 
-        Um thank you for that . Uh Craig do you wanna?
-        Response 1: '0'
-        Example comment 2:
-        Is it working ?
-        Response 2: '1'
-        Example comment 3:
-        Mm . Not quite .
-        Response 2: '2'
-        Please provide only the label no more description.
-        Here are is the comment for the classification task: {comment}
     """,
     'prompt_for_topic_extraction':
     """
@@ -117,7 +117,7 @@ prompts_dict = {
     your answer and create topics as more accurate as possible. Moreover, I will provide you with the lists of extracted
     topics for some previous comments. Please write only the list of extracted topics and not anything else. Here is an 
     example of the format of your response:
-    Extracted topics: ['topic1', 'topic2', ... etc]
+    extracted topics: ['topic1', 'topic2', ... etc]
     Here are the previous extracted topics: {topics} 
     Here is the comment: {comment}  
     """

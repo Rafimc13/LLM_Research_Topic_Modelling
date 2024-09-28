@@ -14,11 +14,11 @@ os.environ["LOKY_MAX_CPU_COUNT"] = "4"
 def generate_eps_values_via_nearest_neighbors(data, num_values=100):
     """
     Generates a range of `eps` values for DBSCAN clustering by examining the nearest neighbor distances
-    within the dataset. The function computes the distance to the nearest neighbor for each data point, and
+    within the dataset. The function computes the distance to the nearest neighbor for each outputs point, and
     then determines the eps values across a range of percentiles of these distances.
 
     Args:
-        data (numpy.ndarray): The dataset for which nearest neighbor distances are calculated. This data should
+        data (numpy.ndarray): The dataset for which nearest neighbor distances are calculated. This outputs should
                               be preprocessed as required for your clustering (e.g., scaled if necessary).
         num_values (int, optional): The number of eps values to generate. These values are spread over
                                     the 10th to 90th percentiles of the nearest neighbor distances. Defaults to 100.
@@ -46,7 +46,7 @@ def calc_dbscan(transformed_data, eps_values):
     for different values of the eps parameter using the DBSCAN algorithm.
 
     Args:
-        transformed_data (numpy.ndarray): Transformed data ready for clustering.
+        transformed_data (numpy.ndarray): Transformed outputs ready for clustering.
         eps_values (list): A list of eps values to evaluate.
 
     Returns:

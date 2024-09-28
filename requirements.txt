@@ -23,3 +23,6 @@ thinc
 umap-learn
 openai
 tiktoken
+rouge
+evaluate
+bert_score

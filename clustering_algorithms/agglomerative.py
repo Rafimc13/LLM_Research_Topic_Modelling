@@ -20,9 +20,9 @@ def calc_agglomerative(transformed_data, n_clusters_values, true_labels=None):
     for different values of the n_clusters parameter using the Agglomerative Clustering algorithm.
 
     Args:
-        transformed_data (numpy.ndarray): Transformed data ready for clustering.
+        transformed_data (numpy.ndarray): Transformed outputs ready for clustering.
         n_clusters_values (list): A list of n_clusters values to evaluate.
-        true_labels (numpy.ndarray, optional): True labels for the data to calculate NMI, ARI, and AMI scores.
+        true_labels (numpy.ndarray, optional): True labels for the outputs to calculate NMI, ARI, and AMI scores.
 
     Returns:
         results (dict): Dictionary containing all the results.
@@ -33,7 +33,7 @@ def calc_agglomerative(transformed_data, n_clusters_values, true_labels=None):
     statistic_values_ari = []
     statistic_values_ami = []
 
-    # Check if the data is sparse and convert to dense if necessary
+    # Check if the outputs is sparse and convert to dense if necessary
     if issparse(transformed_data):
         transformed_data = transformed_data.toarray()
 

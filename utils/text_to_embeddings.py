@@ -116,7 +116,7 @@ def train_fasttext_and_transform(corpus, sentences, text_col, vector_size=256, w
     Trains a FastText model on the provided corpus and transforms the sentences into embeddings.
 
     Args:
-        corpus (pandas.DataFrame): DataFrame containing the text data for training the FastText model.
+        corpus (pandas.DataFrame): DataFrame containing the text outputs for training the FastText model.
         sentences (pandas.Series): Series containing the sentences to be transformed.
         text_col (str): The name of the column in the corpus containing the text.
         vector_size (int): Dimensionality of the FastText vectors.
@@ -125,7 +125,7 @@ def train_fasttext_and_transform(corpus, sentences, text_col, vector_size=256, w
     Returns:
         transformed_data_fasttext (np.array): Array of sentence embeddings.
     """
-    # Prepare the data by tokenizing sentences (split by whitespace for simplicity)
+    # Prepare the outputs by tokenizing sentences (split by whitespace for simplicity)
     tokenized_corpus = [comment.split() for comment in corpus]
 
     # Train the FastText model
