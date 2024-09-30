@@ -92,32 +92,35 @@ prompts_dict = {
     Hello my good model, I would like to create a summary for a group of comments. Please consider the length
     of the summary based on the insights of the comments. Try not to repeat similar topics. The language of the comments
     is {language} and the topic of discussion is: {topic} 
-    I will provide you the comments and I would like you to create the summary in order a to be able to get the most
-    important topics and insights of these comments. Finally, I am going to give you summaries of the previous groups of
-    comments of the same topic discussion, in order to be able to use similar structure.
-    Please write me an efficient summary with all the insights from the comments. Please write only the 
-    summary and do not add anything else in the response. Thank you.
-    Here are the history of the previous summaries of the previous groups of comments: {previous_summaries}
+    I will provide you the comments and I would like you to create the summary in order a to be able to summarize all
+    the thematics topics and insights of these comments. Finally, I am going to give you summaries of the previous 
+    groups of comments of the same topic discussion, in order to be able to use similar structure. Please write me an 
+    efficient summary with all the insights from the comments. Please you are free to decide the length of the summary
+    based on the variation of topics and insights. Please write only the summary and do not add anything else in the 
+    response. Thank you.
+    Here is the history of the previous summaries of the previous groups of comments: {previous_summaries}
     Here are the comments I would like to create a summary: {comments}
     """,
-    'final_prompt_for_summarizing_multiple_comments':
+    'final_prompt_for_summarizing_multiple_summaries':
     """
-    Hello my good model, I would like to create a final summary by derived summaries about the following topic discussion:
-    {topic}. The comments scope to represent the problems, agreements and/or challenges of the topic discussion. 
-    However, for the reason that the comments were too many, I created a summary for groups of comments. So, I would like
-    you to create a final summary based on these summaries of the comments. Please consider the length
+    Hello my good model, I would like to create a final summary by derived summaries about the following topic 
+    discussion: {topic}. The comments scope to represent the problems, agreements and/or challenges of the topic
+    discussion. However, for the reason that the comments were too many, I created a summary for groups of comments.
+    So, I would like you to create a final summary based on these summaries of the comments. Please consider the length
     of the summary based on the insights of the summaries. Try not to repeat similar topics. Please write only the 
     summary and do not add anything else in the response. Thank you.
     Here are the summaries: {summaries} 
     """,
     'prompt_for_topic_extraction':
     """
-    Hello my good model. I would like you to implement a topic extractions, in the comment that I will provide you. 
-    The discussion of the comment is about: "{topic}" and the language of the comment is {language}. Please think about 
-    your answer and create topics as more accurate as possible. Moreover, I will provide you with the lists of extracted
-    topics for some previous comments. Please write only the list of extracted topics and not anything else. Here is an 
-    example of the format of your response:
+    Hello my good model. I would like you to implement thematic topic extraction, in the comment that I will provide
+    you. The discussion of the comment is about: "{topic}" and the language of the comment is {language}. Please think
+    about your answer and create topics as more accurate as possible. Moreover, I will provide you with the lists of
+    extracted topics for some previous comments in order to use the same structure as needed. Please write only the list
+    of extracted topics and not anything else. Here is an example of the format of your response:
     extracted topics: ['topic1', 'topic2', ... etc]
+    If a comment does not contain any topic provide the following: 
+    extracted topics: []
     Here are the previous extracted topics: {topics} 
     Here is the comment: {comment}  
     """
@@ -128,7 +131,7 @@ required_args = {
     "prompt_for_classification_imdb": ["comment"],
     "prompt_for_classification_airlines": ["comment"],
     "prompt_for_summarizing_multiple_comments": ["language", "topic", "previous_summaries", "comments"],
-    "final_prompt_for_summarizing_multiple_comments": ["topic", "summaries"],
+    "final_prompt_for_summarizing_multiple_summaries": ["topic", "summaries"],
     "prompt_for_classification_QMSUM": ["comment"],
     "prompt_for_topic_extraction": ["topic", "language", "topics", "comment"]
 }
