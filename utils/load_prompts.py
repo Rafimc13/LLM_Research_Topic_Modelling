@@ -118,12 +118,23 @@ prompts_dict = {
     about your answer and create topics as more accurate as possible. Moreover, I will provide you with the lists of
     extracted topics for some previous comments in order to use the same structure as needed. Please write only the list
     of extracted topics and not anything else. Here is an example of the format of your response:
-    extracted topics: ['topic1', 'topic2', ... etc]
+    extracted topics: ["topic1", "topic2", ... etc]
     If a comment does not contain any topic provide the following: 
     extracted topics: []
     Here are the previous extracted topics: {topics} 
     Here is the comment: {comment}  
-    """
+    """,
+    'prompt_for_keyword_extraction':
+        """
+        Hello my good model. I would like you to implement keyword extraction, in the comment that I will provide
+        you. The language of the comment is {language}. Please think about your answer and create keywords as more 
+        accurate as possible. Write the most important keywords and not too many. Please write only the list of extracted
+        keywords and not anything else. Here is an example of the format of your response:
+        extracted keywords: ["keyword1", "keyword2", ... etc]
+        If a comment does not contain any keyword provide the following: 
+        extracted topics: []
+        Here is the comment: {comment}  
+        """
 }
 
 # Define the required arguments for each prompt
@@ -133,7 +144,8 @@ required_args = {
     "prompt_for_summarizing_multiple_comments": ["language", "topic", "previous_summaries", "comments"],
     "final_prompt_for_summarizing_multiple_summaries": ["topic", "summaries"],
     "prompt_for_classification_QMSUM": ["comment"],
-    "prompt_for_topic_extraction": ["topic", "language", "topics", "comment"]
+    "prompt_for_topic_extraction": ["topic", "language", "topics", "comment"],
+    "prompt_for_keyword_extraction": ["language", "comment"]
 }
 
 

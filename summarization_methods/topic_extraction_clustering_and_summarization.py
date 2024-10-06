@@ -6,7 +6,7 @@ from sklearn.decomposition import PCA
 
 from clustering_algorithms.kmeans_constrained import get_number_of_clusters_with_statistic_constrained, run_best_kmeans
 from utils.GPT_Prompting import PromptingGPT
-from utils.load_prompts import load_chosen_prompt, get_final_prompt
+from utils.load_prompts import get_final_prompt
 
 
 def topic_extraction(df, text_col, prompt_template, gpt_model, **kwargs):
