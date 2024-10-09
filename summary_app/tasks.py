@@ -1,9 +1,46 @@
 import pandas as pd
 import random
+import ast
 
 from tqdm import tqdm
 from utils.GPT_Prompting import PromptingGPT
 from utils.load_prompts import get_final_prompt
+
+
+def topic_extraction(df, text_col, prompt_template, gpt_model, **kwargs):
+    """
+     Perform classification of comments using GPT models.
+
+     Parameters:
+     - comments: list of str
+     List containing comments to classify.
+     - name_of_prompt: str
+     name of the preferred prompt
+     - GPT model: str
+     GPT model used for Classification
+
+     Returns:
+     - labels_final: list of int
+     List of integer labels corresponding to the classification results.
+     """
+    df['topics'] = ""
+    for idx, comment in enumerate(tqdm(df[text_col].to_list(), total=len(df))):
+        try:
+            gpt_prompts = PromptingGPT()  # Create a new instance of GPT model in each iteration
+            # define the final prompt based on the prompt template
+            kwargs['comment'] = comment
+            final_prompt = get_final_prompt(prompt_template, **kwargs)
+            response = gpt_prompts.make_prompts(final_prompt, gpt_model=gpt_model).strip()
+
+            _, topics = response.split(":", 1)
+            topics = topics.strip()
+            df.loc[idx, 'topics'] = topics
+
+        except Exception as e:
+            print(f"Error processing topics of '{comment}'")
+
+    df['topics'] = df['topics'].apply(lambda x: ast.literal_eval(x))
+    return df
 
 
 def divide_comments_by_time(df, text_column='text', timestamp_column='timestamp', num_groups=15):
@@ -109,3 +146,5 @@ def final_summary_of_divided_comments(prompt, gpt_model, **kwargs):
     except Exception as e:
         print(f"Error processing final summary: {e}")
         return None
+
+

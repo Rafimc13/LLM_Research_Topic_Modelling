@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comments Summary and Topics</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- For visualization -->
+</head>
+<body>
+    <h1>Comments Summary and Topics</h1>
+
+    <!-- File upload form -->
+    <form id="uploadForm" enctype="multipart/form-data">
+        <input type="file" id="fileInput" name="file" accept=".csv">
+        <input type="text" id="textColumnInput" name="text_column" placeholder="Enter the column of the comments"
+               style="height: 16px; width: 200px; font-size: 11px;">
+        <input type="text" id="topicInput" name="topic" placeholder="Enter the topic of the comments"
+               style="height: 16px; width: 200px; font-size: 11px;">
+        <button type="button" onclick="uploadFile()">Upload CSV</button>
+    </form>
+
+    <!-- Placeholder for summaries -->
+    <div id="summary-container"></div>
+
+    <!-- Placeholder for topic chart -->
+    <div id="topics-container">
+        <canvas id="topicsChart"></canvas>
+    </div>
+
+    <script>
+        async function uploadFile() {
+            const formData = new FormData();
+            const fileInput = document.getElementById('fileInput');
+            const textColumnInput = document.getElementById('textColumnInput').value;
+            const topicInput = document.getElementById('topicInput').value;
+            formData.append('file', fileInput.files[0]);
+            formData.append('text_column', textColumnInput);
+            formData.append('topic', topicInput);
+
+            // Upload the file and the text column via POST request
+            const response = await fetch('/upload', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                alert("File uploaded successfully! Processing...");
+                // Now, you can trigger the fetch summary or topic extraction functions
+                fetchSummary();
+                fetchTopics();
+            } else {
+                alert("File upload failed!");
+            }
+        }
+
+        async function fetchSummary() {
+            const response = await fetch('/get_summary', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    text_column: document.getElementById('textColumnInput').value  // pass text column
+                })
+            });
+            const data = await response.json();
+            document.getElementById('summary-container').innerText = data.summaries.join("\n");
+        }
+
+        async function fetchTopics() {
+            const response = await fetch('/get_topics', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    topic: document.getElementById('topicInput').value  // pass topic input
+                })
+            });
+            const data = await response.json();
+            visualizeTopics(data);
+        }
+
+        function visualizeTopics(data) {
+            const ctx = document.getElementById('topicsChart').getContext('2d');
+            const topics = data.map(item => item.topics);
+
+            // Visualization of topics over time using Chart.js
+            const chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.map(item => item.comment),  // Use comment index as labels
+                    datasets: [{
+                        label: 'Topics Over Time',
+                        data: topics,
+                        fill: false,
+                        borderColor: 'blue',
+                        tension: 0.1
+                    }]
+                }
+            });
+        }
+    </script>
+</body>
+</html>

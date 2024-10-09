@@ -1,0 +1,12 @@
+body {
+    font-family: Arial, sans-serif;
+}
+
+#summary-container {
+    margin-bottom: 20px;
+}
+
+#topics-container {
+    width: 80%;
+    margin: 0 auto;
+}
