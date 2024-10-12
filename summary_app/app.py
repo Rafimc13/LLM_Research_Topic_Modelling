@@ -1,12 +1,12 @@
 import pandas as pd
 import os
 
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_from_directory
 from werkzeug.utils import secure_filename
 from summary_app.tasks import divide_comments_by_time, topic_extraction, create_summary_for_groups_of_comments
 from utils.load_prompts import load_chosen_prompt
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='./frontend/dist', template_folder='./frontend/dist')
 
 # Configure upload folder
 UPLOAD_FOLDER = 'uploads'
@@ -18,7 +18,6 @@ comments_df = pd.DataFrame()
 text_column_name = ''
 client_topic = ''
 
-
 # Function to check allowed file types
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -26,7 +25,13 @@ def allowed_file(filename):
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return send_from_directory(app.template_folder, 'index.html')
+
+
+@app.route('/<path:path>')
+def serve_static_files(path):
+    # Serve static files (JS, CSS, etc.) for the Vue.js app
+    return send_from_directory(app.static_folder, path)
 
 
 @app.route('/upload', methods=['POST'])
@@ -49,7 +54,7 @@ def upload_file():
 
         # Load the uploaded CSV into a DataFrame
         comments_df = pd.read_csv(filepath)
-        comments_df = comments_df.iloc[:100]
+        comments_df = comments_df.iloc[:100]  # Limit the size for testing purposes
         return jsonify({'success': True})
     else:
         return jsonify({'success': False, 'error': 'Invalid file type'})
@@ -65,9 +70,11 @@ def get_summary():
     text_col = request.json.get('text_column', text_column_name)
     topic = request.json.get('topic', client_topic)
     language = 'English'
+
     # Extract topics and generate summaries for each time window
     groups = divide_comments_by_time(comments_df, text_column=text_col, timestamp_column='timestamp', num_groups=15)
-    # load the prompt template
+
+    # Load the prompt template
     prompt_template = load_chosen_prompt(prompt_name='prompt_for_summarizing_multiple_comments')
     summaries = create_summary_for_groups_of_comments(groups=groups,
                                                       prompt=prompt_template,
@@ -80,26 +87,12 @@ def get_summary():
 
 @app.route('/get_topics', methods=['POST'])
 def get_topics():
-    # global comments_df, client_topic, text_column_name
-    # if comments_df.empty:
-    #     return jsonify({'error': 'No comments data available'}), 400
-    #
-    # # Get the topic from the user's input
-    # topic = request.json.get('topic', client_topic)
-    #
-    # # Load the prompt template for topic extraction
-    # prompt_template_topics = load_chosen_prompt(prompt_name='prompt_for_topic_extraction')
-    # topics_df, df_topics = topic_extraction(df=comments_df,
-    #                                         text_col=text_column_name,
-    #                                         prompt_template=prompt_template_topics,
-    #                                         gpt_model='gpt-4o',
-    #                                         topic=topic)
     return None
-    # return jsonify(df_topics.to_dict(orient='records'))
 
 
 if __name__ == '__main__':
     # Create uploads folder if it doesn't exist
     if not os.path.exists(UPLOAD_FOLDER):
         os.makedirs(UPLOAD_FOLDER)
+
     app.run(debug=True)
