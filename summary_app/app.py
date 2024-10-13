@@ -1,9 +1,12 @@
 import pandas as pd
 import os
 
-from flask import Flask, render_template, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify, send_from_directory
 from werkzeug.utils import secure_filename
-from summary_app.tasks import divide_comments_by_time, topic_extraction, create_summary_for_groups_of_comments
+from summary_app.services import detect_language, create_json_output
+from summary_app.tasks import (divide_comments_by_time,
+                               topic_extraction,
+                               create_summary_for_groups_of_comments)
 from utils.load_prompts import load_chosen_prompt
 
 app = Flask(__name__, static_folder='./frontend/dist', template_folder='./frontend/dist')
@@ -17,9 +20,19 @@ ALLOWED_EXTENSIONS = {'csv'}
 comments_df = pd.DataFrame()
 text_column_name = ''
 client_topic = ''
+number_of_grouped_summaries = None
 
-# Function to check allowed file types
+
 def allowed_file(filename):
+    """
+    Function to check allowed file types
+    Args:
+        filename (str): filename of the data
+
+    Returns:
+        complete filename path
+
+    """
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
@@ -60,8 +73,8 @@ def upload_file():
         return jsonify({'success': False, 'error': 'Invalid file type'})
 
 
-@app.route('/get_summary', methods=['POST'])
-def get_summary():
+@app.route('/get_grouped_summaries', methods=['POST'])
+def get_summaries_in_groups():
     global comments_df, text_column_name, client_topic
     if comments_df.empty:
         return jsonify({'error': 'No comments data available'}), 400
@@ -69,24 +82,40 @@ def get_summary():
     # Get the column name from the user's input
     text_col = request.json.get('text_column', text_column_name)
     topic = request.json.get('topic', client_topic)
-    language = 'English'
 
+    # find the language of the comments
+    language = detect_language(df=comments_df, column_text=text_col)
+    # load the prompt template for summarizing comments grouped by label
+    prompt_template_topics = load_chosen_prompt(prompt_name='prompt_for_keyword_extraction')
     # Extract topics and generate summaries for each time window
-    groups = divide_comments_by_time(comments_df, text_column=text_col, timestamp_column='timestamp', num_groups=15)
+    comments_df, topics_column = topic_extraction(df=comments_df,
+                                                  text_col=text_col,
+                                                  prompt_template=prompt_template_topics,
+                                                  gpt_model='gpt-4o',
+                                                  topic=topic,
+                                                  language=language)
 
     # Load the prompt template
-    prompt_template = load_chosen_prompt(prompt_name='prompt_for_summarizing_multiple_comments')
-    summaries = create_summary_for_groups_of_comments(groups=groups,
-                                                      prompt=prompt_template,
-                                                      gpt_model='gpt-4o',
-                                                      language=language,
-                                                      topic=topic)
+    prompt_template_summaries = load_chosen_prompt(prompt_name='prompt_for_summarizing_multiple_comments')
+    comments_df, summaries, final_columns = create_summary_for_groups_of_comments(df=comments_df,
+                                                                                  text_column=text_col,
+                                                                                  prompt=prompt_template_summaries,
+                                                                                  num_of_groups=15,
+                                                                                  gpt_model='gpt-4o',
+                                                                                  language=language,
+                                                                                  topic=topic)
+    # create the final columns for extraction
+    final_columns['topics'] = topics_column
+    # Create JSON output combining summaries and comments data
+    json_output = create_json_output(df=comments_df,
+                                     summaries=summaries,
+                                     columns_for_extraction=final_columns)
 
-    return jsonify({'summaries': summaries})
+    return jsonify({'summaries': json_output})
 
 
-@app.route('/get_topics', methods=['POST'])
-def get_topics():
+@app.route('/get_final_summary', methods=['POST'])
+def get_final_summary():
     return None
 
 

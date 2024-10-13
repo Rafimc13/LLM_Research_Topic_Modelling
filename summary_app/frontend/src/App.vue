@@ -50,7 +50,7 @@ import HelloWorld from './components/HelloWorld.vue'
         }
 
         async function fetchSummary() {
-            const response = await fetch('/get_summary', {
+            const response = await fetch('/get_grouped_summaries', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
