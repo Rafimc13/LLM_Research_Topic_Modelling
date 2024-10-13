@@ -128,8 +128,9 @@ prompts_dict = {
         """
         Hello my good model. I would like you to implement keyword extraction, in the comment that I will provide
         you. The language of the comment is {language}. Please think about your answer and create keywords as more 
-        accurate as possible. Write the most important keywords and not too many. Please write only the list of extracted
-        keywords and not anything else. Here is an example of the format of your response:
+        accurate as possible. Write the most important keywords based on the comment that describe the comment better. 
+        Please write only the list of extracted keywords and not anything else. Here is an example of the format of
+        your response:
         extracted keywords: ["keyword1", "keyword2", ... etc]
         If a comment does not contain any keyword provide the following: 
         extracted topics: []
