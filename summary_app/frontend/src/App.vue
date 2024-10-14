@@ -14,10 +14,12 @@
     <!-- Placeholder for summaries -->
     <div id="summary-container"></div>
 
-    <!-- Placeholder for topic chart -->
-    <div id="topics-container">
-        <canvas id="topicsChart"></canvas>
+    <!-- Placeholder for final summary -->
+    <div id="final-summary-container" style="margin-top: 20px;">
+        <h2>Final Summary</h2>
+        <p id="final-summary"></p> <!-- This will display the final summary -->
     </div>
+
 </template>
 <script setup>
 import { RouterLink, RouterView } from 'vue-router'
@@ -64,18 +66,27 @@ import HelloWorld from './components/HelloWorld.vue'
             document.getElementById('summary-container').innerText = data.summaries.join("\n");
         }
 
-        async function fetchTopics() {
-            const response = await fetch('/get_topics', {
+        async function fetch_finalSummary() {
+            const response = await fetch('/get_final_summary', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    topic: document.getElementById('topicInput').value  // pass topic input
+                    topic: document.getElementById('topicInput').value  // pass topic if needed
                 })
             });
+
             const data = await response.json();
-            visualizeTopics(data);
+
+            // Check if the final_summary exists in the response
+            if (data.final_summary) {
+                // Display the final summary in the designated paragraph element
+                document.getElementById('final-summary').innerText = data.final_summary;
+            } else {
+                // Handle error or empty response
+                alert('No final summary available or an error occurred.');
+            }
         }
 
         function visualizeTopics(data) {

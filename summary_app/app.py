@@ -1,16 +1,16 @@
 import pandas as pd
 import os
 
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify, send_from_directory, session
 from werkzeug.utils import secure_filename
 from summary_app.services import detect_language, create_json_output
-from summary_app.tasks import (divide_comments_by_time,
+from summary_app.tasks import (final_summary_of_divided_comments,
                                topic_extraction,
                                create_summary_for_groups_of_comments)
 from utils.load_prompts import load_chosen_prompt
 
 app = Flask(__name__, static_folder='./frontend/dist', template_folder='./frontend/dist')
-
+app.secret_key = os.urandom(24)
 # Configure upload folder
 UPLOAD_FOLDER = 'uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -111,12 +111,26 @@ def get_summaries_in_groups():
                                      summaries=summaries,
                                      columns_for_extraction=final_columns)
 
+    # Store summaries and topic in session for this user
+    session['final_summaries'] = summaries
+    session['client_topic'] = topic
     return jsonify({'summaries': json_output})
 
 
 @app.route('/get_final_summary', methods=['POST'])
 def get_final_summary():
-    return None
+
+    # Get summaries and topic from session
+    final_summaries = session.get('final_summaries')
+    topic = request.json.get('topic', session.get('client_topic'))
+
+    prompt_template_final = load_chosen_prompt(prompt_name='final_prompt_for_summarizing_multiple_summaries')
+    final_summary = final_summary_of_divided_comments(prompt=prompt_template_final,
+                                                      gpt_model='gpt-4o',
+                                                      topic=topic,
+                                                      summaries=final_summaries)
+
+    return jsonify({'final_summary': final_summary})
 
 
 if __name__ == '__main__':
