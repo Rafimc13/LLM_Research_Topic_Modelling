@@ -104,7 +104,7 @@ def final_summary_of_divided_comments(prompt, gpt_model, **kwargs):
             The prompt template to be used for generating the summary.
         gpt_model (str):
             The GPT model to use for generating the summaries.
-        kwargs (dict):
+        kwargs (list):
             Additional arguments that will be inserted into the prompt template as placeholders.
     Returns:
         final_summary (str):
