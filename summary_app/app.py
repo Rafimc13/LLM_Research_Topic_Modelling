@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 
-from flask import Flask, request, jsonify, send_from_directory, session
+from flask import Flask, request, jsonify, send_from_directory
 from werkzeug.utils import secure_filename
 from summary_app.services import detect_language, create_json_output
 from summary_app.tasks import (final_summary_of_divided_comments,
@@ -10,7 +10,6 @@ from summary_app.tasks import (final_summary_of_divided_comments,
 from utils.load_prompts import load_chosen_prompt
 
 app = Flask(__name__, static_folder='./frontend/dist', template_folder='./frontend/dist')
-app.secret_key = os.urandom(24)
 # Configure upload folder
 UPLOAD_FOLDER = 'uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -67,7 +66,7 @@ def upload_file():
 
         # Load the uploaded CSV into a DataFrame
         comments_df = pd.read_csv(filepath)
-        comments_df = comments_df.iloc[:100]  # Limit the size for testing purposes
+        comments_df = comments_df.iloc[:10]  # Limit the size for testing purposes
         return jsonify({'success': True})
     else:
         return jsonify({'success': False, 'error': 'Invalid file type'})
@@ -100,7 +99,7 @@ def get_summaries_in_groups():
     comments_df, summaries, final_columns = create_summary_for_groups_of_comments(df=comments_df,
                                                                                   text_column=text_col,
                                                                                   prompt=prompt_template_summaries,
-                                                                                  num_of_groups=15,
+                                                                                  num_of_groups=2,
                                                                                   gpt_model='gpt-4o',
                                                                                   language=language,
                                                                                   topic=topic)
@@ -111,26 +110,17 @@ def get_summaries_in_groups():
                                      summaries=summaries,
                                      columns_for_extraction=final_columns)
 
-    # Store summaries and topic in session for this user
-    session['final_summaries'] = summaries
-    session['client_topic'] = topic
-    return jsonify({'summaries': json_output})
-
-
-@app.route('/get_final_summary', methods=['POST'])
-def get_final_summary():
-
-    # Get summaries and topic from session
-    final_summaries = session.get('final_summaries')
-    topic = request.json.get('topic', session.get('client_topic'))
-
+    # Generate the final summary for the grouped summaries
     prompt_template_final = load_chosen_prompt(prompt_name='final_prompt_for_summarizing_multiple_summaries')
     final_summary = final_summary_of_divided_comments(prompt=prompt_template_final,
                                                       gpt_model='gpt-4o',
                                                       topic=topic,
-                                                      summaries=final_summaries)
+                                                      summaries=summaries)
 
-    return jsonify({'final_summary': final_summary})
+    return jsonify({
+        'grouped_summaries': json_output,
+        'final_summary': final_summary
+    })
 
 
 if __name__ == '__main__':

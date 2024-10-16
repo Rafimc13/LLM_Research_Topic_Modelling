@@ -1,176 +1,215 @@
 <template>
+  <div class="app-container">
     <h1>Comments Summary and Topics</h1>
 
     <!-- File upload form -->
-    <form id="uploadForm" enctype="multipart/form-data">
-        <input type="file" id="fileInput" name="file" accept=".csv">
-        <input type="text" id="textColumnInput" name="text_column" placeholder="Enter the column of the comments"
-               style="height: 16px; width: 200px; font-size: 11px;">
-        <input type="text" id="topicInput" name="topic" placeholder="Enter the topic of the comments"
-               style="height: 16px; width: 200px; font-size: 11px;">
-        <button type="button" @click="uploadFile">Upload CSV</button>
+    <form id="uploadForm" class="upload-form" enctype="multipart/form-data">
+      <input type="file" id="fileInput" name="file" accept=".csv" class="file-input">
+      <input type="text" id="textColumnInput" name="text_column" placeholder="Enter the column of the comments" class="input-box">
+      <input type="text" id="topicInput" name="topic" placeholder="Enter the topic of the comments" class="input-box">
+      <button type="button" class="upload-button" @click="uploadFile">Upload CSV</button>
     </form>
 
-    <!-- Placeholder for summaries -->
-    <div id="summary-container"></div>
+    <!-- Topics and Summaries Section -->
+    <div class="content-container">
+      <div id="summary-container" class="summary-container">
+        <!-- Loop through groupedSummaries -->
+        <div v-for="(group, groupIndex) in groupedSummaries" :key="groupIndex" class="group-item">
 
-    <!-- Placeholder for final summary -->
-    <div id="final-summary-container" style="margin-top: 20px;">
-        <h2>Final Summary</h2>
-        <p id="final-summary"></p> <!-- This will display the final summary -->
+          <!-- Topics displayed horizontally for each comment -->
+          <div class="comments-topics-horizontal">
+            <!-- Loop through comments for each group -->
+            <div v-for="(comment, commentIndex) in group.comments" :key="commentIndex" class="comment-topics">
+              <!-- Display topics as horizontal nodes for each comment -->
+              <div class="topics">
+                <span v-for="(topic, topicIndex) in comment.topics" :key="topicIndex" class="topic-node">
+                  {{ topic }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Group Summary -->
+          <div class="group-summary">
+            <h4>Summary of Above Comments:</h4>
+            <p>{{ group.summary }}</p>
+          </div>
+
+        </div>
+      </div>
     </div>
 
+    <!-- Final Summary Section -->
+    <div id="final-summary-container" class="final-summary-container">
+      <h2>Final Summary</h2>
+      <p id="final-summary">{{ finalSummary }}</p>
+    </div>
+  </div>
 </template>
+
 <script setup>
-import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
+import { ref } from 'vue'
 
- async function uploadFile() {
-            const formData = new FormData();
-            const fileInput = document.getElementById('fileInput');
-            const textColumnInput = document.getElementById('textColumnInput').value;
-            const topicInput = document.getElementById('topicInput').value;
-            formData.append('file', fileInput.files[0]);
-            formData.append('text_column', textColumnInput);
-            formData.append('topic', topicInput);
+const groupedSummaries = ref([]);
+const finalSummary = ref('');
 
-            // Upload the file and the text column via POST request
-            const response = await fetch('/upload', {
-                method: 'POST',
-                body: formData
-            });
+async function uploadFile() {
+  const formData = new FormData();
+  const fileInput = document.getElementById('fileInput');
+  const textColumnInput = document.getElementById('textColumnInput').value;
+  const topicInput = document.getElementById('topicInput').value;
+  formData.append('file', fileInput.files[0]);
+  formData.append('text_column', textColumnInput);
+  formData.append('topic', topicInput);
 
-            const data = await response.json();
-            if (data.success) {
-                alert("File uploaded successfully! Processing...");
-                // Now, you can trigger the fetch summary or topic extraction functions
-                fetchSummary();
-                //fetchTopics();
-            } else {
-                alert("File upload failed!");
-            }
-        }
+  const response = await fetch('/upload', {
+    method: 'POST',
+    body: formData
+  });
 
-        async function fetchSummary() {
-            const response = await fetch('/get_grouped_summaries', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    text_column: document.getElementById('textColumnInput').value  // pass text column
-                })
-            });
-            const data = await response.json();
-            console.log(data);
-            document.getElementById('summary-container').innerText = data.summaries.join("\n");
-        }
+  const data = await response.json();
+  if (data.success) {
+    alert("File uploaded successfully! Processing...");
+    fetchCompleteSummary();
+  } else {
+    alert("File upload failed!");
+  }
+}
 
-        async function fetch_finalSummary() {
-            const response = await fetch('/get_final_summary', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    topic: document.getElementById('topicInput').value  // pass topic if needed
-                })
-            });
+async function fetchCompleteSummary() {
+  const response = await fetch('/get_grouped_summaries', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      text_column: document.getElementById('textColumnInput').value,
+      topic: document.getElementById('topicInput').value
+    })
+  });
+  const data = await response.json();
 
-            const data = await response.json();
+  console.log(data);
 
-            // Check if the final_summary exists in the response
-            if (data.final_summary) {
-                // Display the final summary in the designated paragraph element
-                document.getElementById('final-summary').innerText = data.final_summary;
-            } else {
-                // Handle error or empty response
-                alert('No final summary available or an error occurred.');
-            }
-        }
-
-        function visualizeTopics(data) {
-            const ctx = document.getElementById('topicsChart').getContext('2d');
-            const topics = data.map(item => item.topics);
-
-            // Visualization of topics over time using Chart.js
-            const chart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: data.map(item => item.comment),  // Use comment index as labels
-                    datasets: [{
-                        label: 'Topics Over Time',
-                        data: topics,
-                        fill: false,
-                        borderColor: 'blue',
-                        tension: 0.1
-                    }]
-                }
-            });
-        }
-
+  groupedSummaries.value = data.grouped_summaries;
+  finalSummary.value = data.final_summary;
+}
 </script>
 
 <style scoped>
-header {
-  line-height: 1.5;
-  max-height: 100vh;
+.app-container {
+  background-color: #f4f4f4;
+  padding: 50px;
+  border-radius: 20px;
+  max-width: 100%;
+  margin: 40px auto; 
+  font-family: 'Arial', sans-serif;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1); /* Added shadow for a clean look */
 }
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-nav {
-  width: 100%;
-  font-size: 12px;
+h1 {
   text-align: center;
-  margin-top: 2rem;
+  font-size: 32px; /* Increased font size */
+  color: #333;
 }
 
-nav a.router-link-exact-active {
-  color: var(--color-text);
+.upload-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px; /* Increased gap */
+  margin-bottom: 30px; /* Increased margin */
 }
 
-nav a.router-link-exact-active:hover {
-  background-color: transparent;
+.file-input, .input-box {
+  padding: 12px;
+  font-size: 16px;
+  width: 1000px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
 }
 
-nav a {
+.upload-button {
+  background-color: #007bff;
+  color: white;
+  padding: 12px 25px;
+  font-size: 16px; /* Increased font size */
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.upload-button:hover {
+  background-color: #0056b3;
+}
+
+.content-container {
+  background-color: white;
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.summary-container {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.group-item {
+  display: flex;
+  flex-direction: column;
+  background-color: #f0f8ff;
+  padding: 20px;
+  border: 2px solid #007bff;  /* Added blue border */
+  border-radius: 15px;
+  margin-bottom: 40px; /* Added spacing between groups */
+}
+
+.comments-topics-horizontal {
+  display: flex; /* Makes topics horizontal */
+  flex-wrap: wrap; /* Ensures topics wrap to the next line if they overflow */
+  gap: 20px; /* Space between topics */
+  margin-bottom: 20px; /* Space between topics and summary */
+}
+
+.topic-node {
+  background-color: #007bff;
+  color: white;
+  padding: 10px 15px;
+  border-radius: 50px;
+  font-size: 14px;
+  text-align: center;
   display: inline-block;
-  padding: 0 1rem;
-  border-left: 1px solid var(--color-border);
 }
 
-nav a:first-of-type {
-  border: 0;
+.group-summary {
+  font-size: 18px;
+  margin-top: 15px;
 }
 
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
+.group-summary h4 {
+  font-size: 20px;
+  font-weight: bold;
+  color: #333;
+}
 
-  .logo {
-    margin: 0 2rem 0 0;
-  }
+.final-summary-container {
+  margin-top: 50px;
+  background-color: #f8f9fa;
+  padding: 40px;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.1);
+}
 
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
+h2 {
+  font-size: 28px;
+  color: #333;
+}
 
-  nav {
-    text-align: left;
-    margin-left: -1rem;
-    font-size: 1rem;
-
-    padding: 1rem 0;
-    margin-top: 1rem;
-  }
+#final-summary {
+  font-size: 20px;
+  color: #555;
 }
 </style>
