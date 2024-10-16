@@ -1,0 +1,8 @@
+.idea
+/secrets.env
+*.pyc
+__pycache__/
+/hulth2003_train/
+/venv
+/uploads
+
