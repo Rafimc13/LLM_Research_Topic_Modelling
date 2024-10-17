@@ -2,11 +2,13 @@
   <div class="modal-backdrop" v-if="isVisible" @click="closeModal">
     <div class="modal-content" @click.stop>
       <h3>Topics List</h3>
-      <ul>
-        <li v-for="(topic, index) in summary?.comments" :key="index">
-          {{ topic }}
-        </li>
-      </ul>
+      <div class="topics-list">
+        <template v-for="(comment, index) in summary?.comments" :key="index">
+          <p v-for="topic in comment.topics">
+            {{ topic }}
+          </p>
+        </template>
+      </div>
       <div class="close" @click="closeModal">x</div>
     </div>
   </div>
@@ -57,13 +59,14 @@ const closeModal = () => {
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   width: 800px;
+  max-height: 80vh;
+  overflow-y: auto;
 }
 
 .modal-content ul {
   margin-top: 20px;
   min-height: 500px;
   max-height: 80vh;
-  overflow-y: auto;
 }
 
 .close {
@@ -87,5 +90,22 @@ const closeModal = () => {
 
 .close:hover {
   background-color: #3f3f3f;
+}
+.topics-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 30px;
+}
+.topics-list p {
+  padding: 5px 10px;
+  background-color: #ffffff;
+  border-radius: 5px;
+  margin: 0;
+  color: #616161;
+  font-size: 14px;
+  font-weight: 500;
+  border: 1px solid #cbcbcb;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 </style>

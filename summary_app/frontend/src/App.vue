@@ -15,7 +15,7 @@
         Drag & Drop or
         <span class="browse-link" @click="triggerFileInput">browse</span>
       </p>
-      <small>Supports: CSV, JPEG, PNG</small>
+      <small>Supports: CSV</small>
       <div v-if="selectedFile" class="selected-file">
         <p>Selected File: {{ selectedFile.name }}</p>
       </div>
@@ -27,7 +27,7 @@
       ref="fileInput"
       @change="handleFileChange"
       style="display: none"
-      accept=".csv, .jpeg, .jpg, .png"
+      accept=".csv"
     />
   </div>
 
@@ -52,31 +52,31 @@
   <div class="loading-items" v-if="summariesLoading">
     <LoadingItem v-for="index in 3" />
   </div>
-  <div>
+  <div v-if="summaries?.grouped_summaries && !summariesLoading">
     <h2>Summaries</h2>
     <div class="summaries-wrapper">
-      <div v-for="(item, index) in testObj" class="summary-item">
+      <div
+        v-for="(item, index) in summaries?.grouped_summaries"
+        class="summary-item"
+      >
         <h3>Summary {{ index + 1 }}</h3>
         <p>
           {{ item.summary }}
         </p>
-        <button @click="openTopicsModal(item)">View Comments</button>
+        <button @click="openTopicsModal(item)">View Topics</button>
       </div>
     </div>
   </div>
   <!-- Placeholder for final summary -->
-  <div v-if="finalSummary">
+  <div v-if="summaries?.final_summary">
     <h2>Final Summary</h2>
     <div class="summary-item">
-      {{ finalSummary }}
+      {{ summaries?.final_summary }}
     </div>
     <!-- This will display the final summary -->
   </div>
-  <div class="loading-items" v-if="finalSummaryLoading">
-    <h2>Final Summary Loading...</h2>
-    <LoadingItem />
-  </div>
   <Modal
+    v-if="currentSummary"
     :summary="currentSummary"
     :isVisible="showModal"
     @close="showModal = false"
@@ -91,11 +91,9 @@ import { ref } from 'vue'
 const fileInput = ref(null)
 const textColumn = ref('')
 const topic = ref('')
-const summaries = ref([])
-const finalSummary = ref('')
+const summaries = ref(null)
 const selectedFile = ref(null)
 const summariesLoading = ref(false)
-const finalSummaryLoading = ref(false)
 const showModal = ref(false)
 const topicsList = ref(['Topic 1', 'Topic 2', 'Topic 3'])
 const currentSummary = ref(null)
@@ -152,6 +150,7 @@ async function uploadFile() {
 }
 
 async function fetchSummary() {
+  summariesLoading.value = true
   const response = await fetch('/get_grouped_summaries', {
     method: 'POST',
     headers: {
@@ -162,8 +161,9 @@ async function fetchSummary() {
 
   const data = await response.json()
   if (data) {
-    summaries.value = data.summaries
-    summariesLoading.value = true
+    summaries.value = data
+    summariesLoading.value = false
+    console.log(data)
   } else {
     summariesLoading.value = false
     alert('Failed to generate summaries.')
