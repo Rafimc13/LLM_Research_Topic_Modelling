@@ -163,8 +163,7 @@ async function fetchSummary() {
   })
 
   const data = await response.json()
-  console.log(data)
-  if (data.success) {
+  if (data) {
     summaries.value = data.summaries
     summariesLoading.value = true
   } else {
