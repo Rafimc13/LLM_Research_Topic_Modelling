@@ -8,7 +8,7 @@ def detect_timestamp_column(df):
     Detect the most likely timestamp column in the dataframe based on column name or data type.
 
     Args:
-        df (pd.DataFrame): The dataframe to search for timestamp columns.
+        df (pd.DataFrame): The dataframe to search for timestamp columns if exist.
 
     Returns:
         str: The name of the detected timestamp column, or None if no timestamp column is found.
