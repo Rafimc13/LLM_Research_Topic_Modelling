@@ -107,8 +107,7 @@ def final_summary_of_divided_comments(prompt, gpt_model, **kwargs):
         kwargs (list):
             Additional arguments that will be inserted into the prompt template as placeholders.
     Returns:
-        final_summary (str):
-            final summary based on the summaries
+        final_summary (str): final summary based on the summaries
     """
     try:
         gpt_prompts = PromptingGPT()  # Create a new instance of GPT model in each iteration
