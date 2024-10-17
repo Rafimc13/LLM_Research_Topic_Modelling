@@ -64,8 +64,6 @@
       </div>
     </div>
   </div>
-  <div id="summary-container">{{ summaries.join('\n') }}</div>
-
   <!-- Placeholder for final summary -->
   <div v-if="finalSummary">
     <h2>Final Summary</h2>
