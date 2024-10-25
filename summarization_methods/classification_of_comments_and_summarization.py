@@ -4,7 +4,9 @@ from utils.load_prompts import get_final_prompt
 
 
 def classify_comments(df, text_col, prompt_name, gpt_model='gpt-4o'):
-
+    """
+    Classify comments based on LLM
+    """
     pred_labels = GPT_Classifier(df[text_col].to_list(), name_of_prompt=prompt_name, GPT_model=gpt_model)
     df['labels'] = pred_labels
 
