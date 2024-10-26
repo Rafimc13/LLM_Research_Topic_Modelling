@@ -66,7 +66,7 @@ def upload_file():
 
         # Load the uploaded CSV into a DataFrame
         comments_df = pd.read_csv(filepath)
-        comments_df = comments_df.iloc[:10]  # Limit the size for testing purposes
+        comments_df = comments_df.iloc[:10]  # TODO: Limit the size for testing purposes. It will be removed
         return jsonify({'success': True})
     else:
         return jsonify({'success': False, 'error': 'Invalid file type'})

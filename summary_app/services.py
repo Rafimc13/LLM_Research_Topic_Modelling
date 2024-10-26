@@ -86,6 +86,15 @@ def divide_comments_by_time(df, timestamp_column=None, num_groups=15):
         df = df.sample(frac=1).reset_index(drop=True)  # Shuffle the rows if no timestamp
     else:
         print(f'Grouping comments by the timestamp column: {timestamp_column}')
+        try:
+            # Remove the 'Z' from the end of each timestamp
+            df[timestamp_column] = df[timestamp_column].str.replace('Z', '', regex=False).replace('z', '', regex=False)
+            # Convert to datetime
+            df[timestamp_column] = pd.to_datetime(df[timestamp_column], format="%Y-%m-%dT%H:%M:%S%z")
+        except ValueError as e:
+            print(f'The following error is occurred with timestamp: {e}')
+            print("Keeping original timestamp values where parsing failed.")
+
         df = df.sort_values(by=timestamp_column)  # Sort by the detected timestamp
 
     # Calculate the size of each group
@@ -105,6 +114,18 @@ def divide_comments_by_time(df, timestamp_column=None, num_groups=15):
     df[col_for_groups] = group_numbers
 
     return df, col_for_groups
+
+
+def calc_top_topics(df, column_name='topics'):
+    all_topics = [topic for topics in df[column_name] for topic in topics]
+
+    # Count occurrences of each topic
+    topic_counts = Counter(all_topics)
+
+    # Get the top 10 topics
+    top_topics = topic_counts.most_common(10)
+
+    return top_topics
 
 
 def create_json_output(df, summaries, columns_for_extraction):
@@ -130,13 +151,25 @@ def create_json_output(df, summaries, columns_for_extraction):
 
     # Loop through each unique group and generate the output for each group
     for group_number, summary in zip(unique_groups, summaries):
-        group_data = {
-            "summary": summary,
-            "comments": []
-        }
-
         # Filter dataframe for the current group
         group_df = df[df[group_col] == group_number]
+        # generate the top 10 topics in the group
+        top_topics = calc_top_topics(group_df, topic_col)
+        # define the start time
+        if timestamp_col is not None:
+            start_time = group_df[timestamp_col].min()
+            end_time = group_df[timestamp_col].max()
+        else:
+            start_time = None
+            end_time = None
+
+        group_data = {
+            "summary": summary,
+            "top_topics": top_topics,
+            "start_time": start_time,
+            "end_time": end_time,
+            "comments": [],
+        }
 
         # Add each comment's details to the 'comments' list for this group
         for _, row in group_df.iterrows():
