@@ -63,8 +63,8 @@
         <p>
           {{ item.summary }}
         </p>
-        <ul v-if="item.top_topics" class="top-topics">
-          <li v-for="topic in item.top_topics" class="top-topic">
+        <ul v-if="item.top_topics" class="topics-list">
+          <li v-for="topic in item.top_topics" class="topic-item">
             <span class="number">{{ topic[1] }}</span>
             <span> {{ topic[0] }}</span>
           </li>
@@ -99,6 +99,7 @@
 import Modal from './components/Modal.vue'
 import LoadingItem from './components/LoadingItem.vue'
 import response from './testing/response'
+import { formatDate } from './helpers/formaters.js'
 import { ref } from 'vue'
 
 const fileInput = ref(null)
@@ -111,8 +112,8 @@ const showModal = ref(false)
 const topicsList = ref(['Topic 1', 'Topic 2', 'Topic 3'])
 const currentSummary = ref(null)
 
-console.log(response)
-summaries.value = response //only for testing
+// console.log(response)
+// summaries.value = response //only for testing
 
 // Trigger file input when user clicks on "browse"
 function triggerFileInput() {
@@ -189,26 +190,9 @@ function openTopicsModal(item) {
   currentSummary.value = item
   showModal.value = true
 }
-
-function formatDate(dateString) {
-  // Create a Date object from the string
-  const date = new Date(dateString)
-
-  // Get the day, month, year, hours, and minutes
-  const day = String(date.getDate()).padStart(2, '0')
-  const month = String(date.getMonth() + 1).padStart(2, '0') // Months are 0-based
-  const year = date.getFullYear()
-  const hours = String(date.getHours()).padStart(2, '0')
-  const minutes = String(date.getMinutes()).padStart(2, '0')
-
-  // Format as dd/mm/yyyy hh:mm
-  const formattedDate = `${day}/${month}/${year} ${hours}:${minutes}`
-
-  return formattedDate
-}
 </script>
 
-<style scoped>
+<style>
 /* Styles for the drag and drop file input */
 .file-upload-container {
   text-align: center;
@@ -341,7 +325,7 @@ h1 {
 .summary-item button:hover {
   background-color: #0056b3;
 }
-.top-topics {
+.topics-list {
   display: flex;
   list-style: none;
   padding: 0;
@@ -349,7 +333,7 @@ h1 {
   flex-wrap: wrap;
   margin-top: 15px;
 }
-.top-topics li {
+.topics-list li {
   display: flex;
   padding: 2px 10px 2px 6px;
   align-items: center;
@@ -357,7 +341,7 @@ h1 {
   background-color: #c8e3ff;
   gap: 10px;
 }
-.top-topics li .number {
+.topics-list li .number {
   height: 20px;
   width: 20px;
   display: flex;

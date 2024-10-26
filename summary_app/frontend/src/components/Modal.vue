@@ -1,13 +1,23 @@
 <template>
   <div class="modal-backdrop" v-if="isVisible" @click="closeModal">
     <div class="modal-content" @click.stop>
-      <h3>Topics List</h3>
-      <div class="topics-list">
-        <template v-for="(comment, index) in summary?.comments" :key="index">
-          <p v-for="topic in comment.topics">
-            {{ topic }}
-          </p>
-        </template>
+      <h3>Comments List ({{ summary?.comments.length }})</h3>
+      <div class="comments-list">
+        <div
+          v-for="(item, index) in summary?.comments"
+          :key="index"
+          class="comment-item"
+        >
+          <p>{{ item.comment }}</p>
+          <ul v-if="item.topics" class="topics-list">
+            <li v-for="topic in item.topics" class="topic-item">
+              <span>{{ topic }}</span>
+            </li>
+          </ul>
+          <div class="summary-time">
+            <div>{{ formatDate(item.timestamp) }}</div>
+          </div>
+        </div>
       </div>
       <div class="close" @click="closeModal">x</div>
     </div>
@@ -16,6 +26,7 @@
 
 <script setup>
 import { defineProps, defineEmits, ref } from 'vue'
+import { formatDate } from '../helpers/formaters.js'
 
 // Define the props
 const props = defineProps({
@@ -63,12 +74,6 @@ const closeModal = () => {
   overflow-y: auto;
 }
 
-.modal-content ul {
-  margin-top: 20px;
-  min-height: 500px;
-  max-height: 80vh;
-}
-
 .close {
   margin-top: 0;
   padding: 10px 15px;
@@ -91,18 +96,18 @@ const closeModal = () => {
 .close:hover {
   background-color: #3f3f3f;
 }
-.topics-list {
+.comments-list {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
   margin-top: 30px;
 }
-.topics-list p {
-  padding: 5px 10px;
+.comments-list .comment-item {
+  width: 100%;
+  padding: 15px 10px;
   background-color: #ffffff;
   border-radius: 5px;
   margin: 0;
-  color: #616161;
   font-size: 14px;
   font-weight: 500;
   border: 1px solid #cbcbcb;
