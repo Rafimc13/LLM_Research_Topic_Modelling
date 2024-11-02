@@ -73,11 +73,11 @@ def calc_kmeans(transformed_data, max_clusters, true_labels=None):
         best_kappa_ami = statistic_values_ami[k_silhouette-1]
         best_kappa_ari = statistic_values_ari[k_silhouette-1]
         print(
-            f'The NMI score is: {best_kappa_nmi} for the best Kappa {k_silhouette}')
+            f'The NMI score is: {round(best_kappa_nmi, 2)} for the best Kappa {k_silhouette}')
         print(
-            f'The AMI score is: {best_kappa_ami} for the best Kappa {k_silhouette}')
+            f'The AMI score is: {round(best_kappa_ami, 2)} for the best Kappa {k_silhouette}')
         print(
-            f'The ARI score is: {best_kappa_ari} for the best Kappa {k_silhouette}')
+            f'The ARI score is: {round(best_kappa_ari, 2)} for the best Kappa {k_silhouette}')
 
     # store the results into a dictionary to return it
     k_means_results = {
